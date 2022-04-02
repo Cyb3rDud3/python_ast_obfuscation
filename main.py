@@ -3,9 +3,9 @@ import random
 from ast import *
 from ast import Compare, Global, ClassDef
 from ast import Subscript, Slice, Attribute, GeneratorExp, comprehension
-from base64 import b64encode,b32encode
-from astunparse import unparse
+from base64 import b64encode
 
+from astunparse import unparse
 
 from utils import random_string
 
@@ -25,10 +25,10 @@ def import_node(name, newname):
                    keywords=[], starargs=None, kwargs=None))
 
 
-def obfuscate_string(s,placeholder=None):
+def obfuscate_string(s, placeholder=None):
     """Various String Obfuscation routines."""
     randstr = random_string(3, 10)
-    #print('here for', s)
+    # print('here for', s)
 
     table0 = [
         # '' -> ''
@@ -71,38 +71,69 @@ def obfuscate_string(s,placeholder=None):
                                   args=[ListComp(elt=Call(func=Attribute(value=Subscript(value=Call(func=Name
                                   (id='globals', ctx=Load()), args=[], keywords=[]), slice=Index(value=Constant
                                   (value='__builtins__', kind=None)), ctx=Load()), attr='chr', ctx=Load()),
-                                args=[Call(func=Name(id='ord', ctx=Load()),
-                                args=[Name(id=randstr, ctx=Load())], keywords=[])],
-                            keywords=[]), generators=[comprehension(target=Name
-                            (id=randstr, ctx=Store()), iter=Subscript(value=Constant(value=x[::-1],
-                            kind=None), slice=Slice(lower=None, upper=None, step=UnaryOp(op=USub(),
-                                operand=Constant(value=1, kind=None))), ctx=Load()), ifs=[], is_async=0)])], keywords=[])),
+                                                          args=[Call(func=Name(id='ord', ctx=Load()),
+                                                                     args=[Name(id=randstr, ctx=Load())], keywords=[])],
+                                                          keywords=[]), generators=[comprehension(target=Name
+                                  (id=randstr, ctx=Store()), iter=Subscript(value=Constant(value=x[::-1],
+                                                                                           kind=None),
+                                                                            slice=Slice(lower=None, upper=None,
+                                                                                        step=UnaryOp(op=USub(),
+                                                                                                     operand=Constant(
+                                                                                                         value=1,
+                                                                                                         kind=None))),
+                                                                            ctx=Load()), ifs=[], is_async=0)])],
+                                  keywords=[])),
 
+        lambda x: Call(func=Attribute(value=Call(func=Attribute(value=Call(func=Name(id='getattr',
+                                                                                     ctx=Load()), args=[
+            Call(func=Subscript(value=Attribute(value=Subscript(value=Call(func=Name(id='globals',
+                                                                                     ctx=Load()), args=[], keywords=[]),
+                                                                slice=Index(
+                                                                    value=Constant(value='__builtins__', kind=None)),
+                                                                ctx=Load()), attr='__dict__', ctx=Load()),
+                                slice=Index(value=Constant(value='__import__', kind=None)),
+                                ctx=Load()),
+                 args=[Call(func=Attribute(value=Constant(value='', kind=None), attr='join', ctx=Load()),
+                            args=[ListComp(
+                                elt=Call(func=Name(id='chr', ctx=Load()), args=[Call(func=Name(id='ord', ctx=Load()),
+                                                                                     args=[
+                                                                                         Name(id=randstr, ctx=Load())],
+                                                                                     keywords=[])], keywords=[]),
+                                generators=[comprehension(target=Name(id=randstr, ctx=Store()),
+                                                          iter=Subscript(value=Constant(value='46esab', kind=None),
+                                                                         slice=Slice(lower=None, upper=None,
+                                                                                     step=UnaryOp(op=USub(),
+                                                                                                  operand=Constant(
+                                                                                                      value=1,
+                                                                                                      kind=None))),
+                                                                         ctx=Load()), ifs=[], is_async=0)])],
+                            keywords=[])], keywords=[]),
+            BinOp(left=BinOp(left=BinOp(left=Constant(value='b', kind=None), op=Add(),
+                                        right=Subscript(value=Constant(value='46', kind=None),
+                                                        slice=Slice(lower=None, upper=None, step=UnaryOp(op=USub(),
+                                                                                                         operand=Constant(
+                                                                                                             value=1,
+                                                                                                             kind=None))),
+                                                        ctx=Load())), op=Add(),
+                             right=Subscript(value=Constant(value='ced', kind=None),
+                                             slice=Slice(lower=None, upper=None,
+                                                         step=UnaryOp(op=USub(), operand=Constant(value=1, kind=None))),
+                                             ctx=Load())), op=Add(),
+                  right=Subscript(value=Constant(value='edo', kind=None),
+                                  slice=Slice(lower=None, upper=None,
+                                              step=UnaryOp(op=USub(), operand=Constant(value=1, kind=None))),
+                                  ctx=Load()))], keywords=[]), attr='__call__', ctx=Load()),
+                                                 args=[Subscript(
+                                                     value=Constant(value=b64encode(x.encode()).decode()[::-1],
+                                                                    kind=None),
+                                                     slice=Slice(lower=None, upper=None, step=UnaryOp(op=USub(),
+                                                                                                      operand=Constant(
+                                                                                                          value=1,
+                                                                                                          kind=None))),
+                                                     ctx=Load())],
+                                                 keywords=[]), attr='decode', ctx=Load()), args=[], keywords=[]),
 
-    lambda x: Call(func=Attribute(value=Call(func=Attribute(value=Call(func=Name(id='getattr',
-        ctx=Load()), args=[Call(func=Subscript(value=Attribute(value=Subscript(value=Call(func=Name(id='globals',
-    ctx=Load()), args=[], keywords=[]), slice=Index(value=Constant(value='__builtins__', kind=None)),
-ctx=Load()), attr='__dict__', ctx=Load()), slice=Index(value=Constant(value='__import__', kind=None)),
-        ctx=Load()), args=[Call(func=Attribute(value=Constant(value='', kind=None), attr='join', ctx=Load()),
-    args=[ListComp(elt=Call(func=Name(id='chr', ctx=Load()), args=[Call(func=Name(id='ord', ctx=Load()),
-        args=[Name(id=randstr, ctx=Load())], keywords=[])], keywords=[]),
-            generators=[comprehension(target=Name(id=randstr, ctx=Store()), iter=Subscript(value=Constant(value='46esab', kind=None),
-            slice=Slice(lower=None, upper=None, step=UnaryOp(op=USub(), operand=Constant(value=1, kind=None))),
-            ctx=Load()), ifs=[], is_async=0)])], keywords=[])], keywords=[]),
-                    BinOp(left=BinOp(left=BinOp(left=Constant(value='b', kind=None), op=Add(),
-        right=Subscript(value=Constant(value='46', kind=None),
-            slice=Slice(lower=None, upper=None, step=UnaryOp(op=USub(), operand=Constant(value=1, kind=None))),
-    ctx=Load())), op=Add(), right=Subscript(value=Constant(value='ced', kind=None),
-        slice=Slice(lower=None, upper=None, step=UnaryOp(op=USub(), operand=Constant(value=1, kind=None))),
-        ctx=Load())), op=Add(), right=Subscript(value=Constant(value='edo', kind=None),
-            slice=Slice(lower=None, upper=None, step=UnaryOp(op=USub(), operand=Constant(value=1, kind=None))),
-                ctx=Load()))], keywords=[]), attr='__call__', ctx=Load()),
-                        args=[Subscript(value=Constant(value=b64encode(x.encode()).decode()[::-1], kind=None),
-                slice=Slice(lower=None, upper=None, step=UnaryOp(op=USub(), operand=Constant(value=1, kind=None))), ctx=Load())],
-                                                        keywords=[]), attr='decode', ctx=Load()), args=[], keywords=[]),
-
-
-]
+    ]
     # 'abc' -> 'cba'[::-1]
 
     #
@@ -120,46 +151,37 @@ ctx=Load()), attr='__dict__', ctx=Load()), slice=Index(value=Constant(value='__i
 class Obfuscator(NodeTransformer):
     def __init__(self):
         NodeTransformer.__init__(self)
-
-        # imported modules
         self.imports = {}
-        self.assignments = {}
-
-        # global values (can be renamed)
-        self.globs = {}
+        self.global_variables = {}
         self.functions = []
         self.inclass = False
         self.in_init = False
-
-        # local values
-        self.locs = {}
-        self.fNames = {}
-        # inside a function
+        self.local_variables = {}
         self.indef = False
 
     def obfuscate_global(self, name):
         newname = random_string(3, 10)
         if self.imports.get(name):
             return self.imports.get(name)
-        if self.globs.get(name):
-            return self.globs.get(name)
-        self.globs[name] = newname
+        if self.global_variables.get(name):
+            return self.global_variables.get(name)
+        self.global_variables[name] = newname
         return newname
 
     def obfuscate_local(self, name):
         newname = random_string(3, 10)
-        self.locs[name] = newname
+        self.local_variables[name] = newname
         return newname
 
     def visit_alias(self, node: alias):
-        self.globs[node.name] = node.name
+        self.global_variables[node.name] = node.name
         return node
-
 
     def visit_ImportFrom(self, node: ImportFrom):
         node.names = [self.visit(name) for name in node.names]
         self.imports[node.module] = node.module
         return node
+
     def visit_Import(self, node):
         if self.imports.get(node.names[0].name):
             return node
@@ -180,7 +202,6 @@ class Obfuscator(NodeTransformer):
     def visit_BoolOp(self, node: BoolOp):
         node.values = [self.visit(value) for value in node.values]
         return node
-
 
     def visit_ListComp(self, node: ListComp):
         node.elt = self.visit(node.elt)
@@ -210,8 +231,6 @@ class Obfuscator(NodeTransformer):
         node.value = self.visit(node.value)
         return node
 
-
-
     def visit_In(self, node: In):
         return node
 
@@ -220,8 +239,6 @@ class Obfuscator(NodeTransformer):
 
     def visit_Expression(self, node: Expression):
         return node
-
-
 
     def visit_Continue(self, node: Continue):
         return node
@@ -232,22 +249,27 @@ class Obfuscator(NodeTransformer):
         return node
 
     def visit_While(self, node: While):
+        node.body = [self.visit(x) for x in node.body]
+        node.test = self.visit(node.test)
+        node.orelse = [self.visit(x) for x in node.orelse]
         return node
+
     def visit_Tuple(self, node: Tuple):
         node.elts = [self.visit(x) for x in node.elts]
 
         return node
 
     def visit_For(self, node: For):
-        #print(node.__dict__)
+        # print(node.__dict__)
         node.target = self.visit_Name(node.target)
         node.iter = self.visit(node.iter)
-        node.body = [self.visit(x) for x in node.body ]
-        #node.target = self.visit(node.target)
-        #node.body = [self.visit(x) for x in node.body]
-        #node.iter = self.visit(node.iter)
-        #node.orelse = [self.visit(x) for x in node.orelse]
+        node.body = [self.visit(x) for x in node.body]
+        # node.target = self.visit(node.target)
+        # node.body = [self.visit(x) for x in node.body]
+        # node.iter = self.visit(node.iter)
+        # node.orelse = [self.visit(x) for x in node.orelse]
         return node
+
     def visit_Try(self, node: Try):
         node.body = [self.visit(x) for x in node.body]
         node.handlers = [self.visit(x) for x in node.handlers]
@@ -260,7 +282,7 @@ class Obfuscator(NodeTransformer):
 
         return node
 
-    def visit_Compare(self, node: Compare) :
+    def visit_Compare(self, node: Compare):
         node.left = self.visit(node.left)
         node.ops = [self.visit(x) for x in node.ops]
         node.comparators = [self.visit(x) for x in node.comparators]
@@ -271,6 +293,7 @@ class Obfuscator(NodeTransformer):
         node.iter = self.visit(node.iter)
         node.ifs = [self.visit(x) for x in node.ifs]
         return node
+
     def visit_GeneratorExp(self, node: GeneratorExp):
         node.elt = self.visit(node.elt)
         node.generators = [self.visit(x) for x in node.generators]
@@ -280,17 +303,17 @@ class Obfuscator(NodeTransformer):
         if isinstance(node.test.left, ast.Call):
             for arg in node.test.left.args:
                 if isinstance(arg, Name):
-                    if arg.id in self.globs:
-                        arg.id = self.globs[arg.id]
+                    if arg.id in self.global_variables:
+                        arg.id = self.global_variables[arg.id]
                 elif isinstance(arg, Attribute):
-                    if arg.value in self.globs:
-                        arg.value = self.globs[arg.value]
-                    if arg.attr in self.globs:
-                        arg.attr = self.globs[arg.attr]
+                    if arg.value in self.global_variables:
+                        arg.value = self.global_variables[arg.value]
+                    if arg.attr in self.global_variables:
+                        arg.attr = self.global_variables[arg.attr]
 
         if isinstance(node.test.comparators[0], ast.Name):
-            if node.test.comparators[0].id in self.globs:
-                node.test.comparators[0].id = self.globs[node.test.comparators[0].id]
+            if node.test.comparators[0].id in self.global_variables:
+                node.test.comparators[0].id = self.global_variables[node.test.comparators[0].id]
 
         return node
 
@@ -309,12 +332,11 @@ class Obfuscator(NodeTransformer):
         if type(node.s) != str:
             return node
         if '{}' in node.s:
-            return obfuscate_string(node.s,placeholder="formatString")
-        if '{' in node.s: #prevent f strings
+            return obfuscate_string(node.s, placeholder="formatString")
+        if '{' in node.s:  # prevent f strings
             return node.s
 
         return obfuscate_string(node.s)
-
 
     def visit_Is(self, node: Is):
         return node
@@ -360,16 +382,17 @@ class Obfuscator(NodeTransformer):
 
     def visit_ExtSlice(self, node: ExtSlice):
         return node
+
     def visit_arguments(self, node: arguments):
         for argument in node.args:
-            if argument.arg in self.globs:
-                argument.arg = self.globs[argument.arg]
+            if argument.arg in self.global_variables:
+                argument.arg = self.global_variables[argument.arg]
             else:
                 argument.arg = self.obfuscate_global(argument.arg)
         return node
 
     def visit_Attribute(self, node: Attribute):
-        if isinstance(list(node.value.__dict__.values())[0],Name):
+        if isinstance(list(node.value.__dict__.values())[0], Name):
             node.value = self.visit(node.value)
         if node.__dict__.get('id'):
             node.attr = self.obfuscate_global(node.attr)
@@ -379,30 +402,26 @@ class Obfuscator(NodeTransformer):
                     node.attr = self.obfuscate_global(node.attr)
                 elif node.value.id in self.imports:
                     node.value.id = self.imports.get(node.value.id)
-                elif node.value.id in self.globs:
-                    node.value.id = self.globs[node.value.id]
+                elif node.value.id in self.global_variables:
+                    node.value.id = self.global_variables[node.value.id]
                 elif isinstance(node.value.id, Name):
                     node.value.id = self.visit(node.value.id)
             else:
                 node.value = self.visit(node.value)
 
-
-
-       # node.attr = self.visit(node.attr)
-        #node.value = self.visit(node.value)
-
+        # node.attr = self.visit(node.attr)
+        # node.value = self.visit(node.value)
 
         return node
 
-    def visit_Bytes(self, node: Bytes) :
+    def visit_Bytes(self, node: Bytes):
         return node
-
 
     def visit_Call(self, node: Call):
         node.func = self.visit(node.func)
-        for index,argument in enumerate(node.args):
+        for index, argument in enumerate(node.args):
             if type(argument) == str:
-                node.args[index] = ast.arg(arg='"'+argument+'"',annotation=None)
+                node.args[index] = ast.arg(arg='"' + argument + '"', annotation=None)
         node.args = [self.visit(x) for x in node.args]
         node.keywords = [self.visit(x) for x in node.keywords]
         return node
@@ -414,16 +433,16 @@ class Obfuscator(NodeTransformer):
                 if isinstance(lower, ast.Name):
                     node.slice.__dict__['lower'] = self.__getattribute__(
                         "visit_" + str(type(lower)).split('.')[1].split("'")[0].strip())(lower)
-                if isinstance(upper,Name):
+                if isinstance(upper, Name):
                     upper.id = self.obfuscate_global(upper.id)
                 node.slice.__dict__['upper'] = self.__getattribute__(
                     "visit_" + str(type(upper)).split('.')[1].split("'")[0].strip())(upper)
         if isinstance(node.value, ast.Constant):
-            if node.value.value in self.globs:
-                node.value.value = self.globs[node.value.value]
+            if node.value.value in self.global_variables:
+                node.value.value = self.global_variables[node.value.value]
         elif isinstance(node.value, ast.Attribute):
-            if node.value.attr in self.globs:
-                node.value.attr = self.globs[node.value.attr]
+            if node.value.attr in self.global_variables:
+                node.value.attr = self.global_variables[node.value.attr]
         else:
             node.value = self.visit(node.value)
 
@@ -438,13 +457,13 @@ class Obfuscator(NodeTransformer):
 
     def visit_AnnAssign(self, node: AnnAssign):
         node.target = self.visit(node.target)
-        #node.value = self.visit(node.value)
+        # node.value = self.visit(node.value)
         return node
 
     def visit_classMethod(self, node):
-        #print(node.__dict__)
+        # print(node.__dict__)
         node.body = [self.visit(x) for x in node.body]
-       # node.args = self.visit(node.args)
+        # node.args = self.visit(node.args)
         node.decorator_list = [self.visit(dec) for dec in node.decorator_list]
         if node.__dict__.get('args'):
             for arg in node.args.args:
@@ -461,27 +480,28 @@ class Obfuscator(NodeTransformer):
 
     def visit_JoinedStr(self, node: JoinedStr):
         for value in node.values:
-            if isinstance(value.value,FormattedValue):
+            if isinstance(value.value, FormattedValue):
                 value.value = self.visit_FormattedValue(value.value)
-            elif isinstance(value.value,Constant):
+            elif isinstance(value.value, Constant):
                 value.value = self.visit_Constant(value.value)
-            elif isinstance(value.value,Name):
+            elif isinstance(value.value, Name):
                 value.value = self.visit_Name(value.value)
-            elif isinstance(value.value,Attribute):
+            elif isinstance(value.value, Attribute):
                 value.value = self.visit_Attribute(value.value)
-            elif isinstance(value.value,Call):
+            elif isinstance(value.value, Call):
                 value.value = self.visit_Call(value.value)
             else:
                 if type(value.value) != str:
                     value.value = self.visit(value.value)
 
         return node
+
     def visit_FunctionDef(self, node):
         if node in self.functions:
             return self.visit_classMethod(node)
         node.args = self.visit_arguments(node.args)
         self.indef = True
-        self.locs = {}
+        self.local_variables = {}
         node.name = self.obfuscate_global(node.name)
         node.body = [self.visit(x) for x in node.body]
         self.indef = False
@@ -504,7 +524,7 @@ class Obfuscator(NodeTransformer):
         return node
 
     def visit_Name(self, node):
-        if isinstance(node,Tuple):
+        if isinstance(node, Tuple):
             node = self.visit(node)
             return node
         if __builtins__.__dict__.get(node.id):
@@ -512,23 +532,22 @@ class Obfuscator(NodeTransformer):
         node.id = self.obfuscate_global(node.id)
         return node
 
-
     def visit_Module(self, node):
         node.body = [y for y in (self.visit(x) for x in node.body) if y]
         node.body = [y for y in (self.visit(x) for x in node.body) if y]
         return node
 
 
-class GlobalsEnforcer(Obfuscator):
-    def __init__(self, globs):
+class ValidateGlobalVars(Obfuscator):
+    def __init__(self, global_variables):
         Obfuscator.__init__(self)
-        self.globs = globs
+        self.global_variables = global_variables
 
     def visit_Name(self, node):
-        if isinstance(node,ast.Tuple):
+        if isinstance(node, ast.Tuple):
             node = self.visit(node)
             return node
-        node.id = self.globs.get(node.id, node.id)
+        node.id = self.global_variables.get(node.id, node.id)
         return node
 
     def visit_classMethod(self, node):
@@ -544,7 +563,7 @@ class GlobalsEnforcer(Obfuscator):
         if node in self.functions:
             return self.visit_classMethod(node)
         self.indef = True
-        self.locs = {}
+        self.local_variables = {}
         node.name = self.obfuscate_global(node.name)
         node.body = [self.visit(x) for x in node.body]
         self.indef = False
@@ -553,9 +572,8 @@ class GlobalsEnforcer(Obfuscator):
 
 obf = Obfuscator()
 code = r"""
-
 """
 tree = parse(code)
 r = obf.visit(tree)
-r = GlobalsEnforcer(obf.globs).visit(r)
+r = ValidateGlobalVars(obf.global_variables).visit(r)
 print(unparse(r))

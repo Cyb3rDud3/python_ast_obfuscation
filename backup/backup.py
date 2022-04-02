@@ -126,13 +126,13 @@ class Obfuscator(NodeTransformer):
         self.assignments = {}
 
         # global values (can be renamed)
-        self.globs = {}
+        self.global_variables = {}
         self.functions = []
         self.inclass = False
         self.in_init = False
 
         # local values
-        self.locs = {}
+        self.local_variables = {}
         self.fNames = {}
         # inside a function
         self.indef = False
@@ -141,18 +141,18 @@ class Obfuscator(NodeTransformer):
         newname = random_string(3, 10)
         if self.imports.get(name):
             return self.imports.get(name)
-        if self.globs.get(name):
-            return self.globs.get(name)
-        self.globs[name] = newname
+        if self.global_variables.get(name):
+            return self.global_variables.get(name)
+        self.global_variables[name] = newname
         return newname
 
     def obfuscate_local(self, name):
         newname = random_string(3, 10)
-        self.locs[name] = newname
+        self.local_variables[name] = newname
         return newname
 
     def visit_alias(self, node: alias):
-        self.globs[node.name] = node.name
+        self.global_variables[node.name] = node.name
         return node
 
 
@@ -233,17 +233,17 @@ class Obfuscator(NodeTransformer):
         if isinstance(node.test.left, ast.Call):
             for arg in node.test.left.args:
                 if isinstance(arg, Name):
-                    if arg.id in self.globs:
-                        arg.id = self.globs[arg.id]
+                    if arg.id in self.global_variables:
+                        arg.id = self.global_variables[arg.id]
                 elif isinstance(arg, Attribute):
-                    if arg.value in self.globs:
-                        arg.value = self.globs[arg.value]
-                    if arg.attr in self.globs:
-                        arg.attr = self.globs[arg.attr]
+                    if arg.value in self.global_variables:
+                        arg.value = self.global_variables[arg.value]
+                    if arg.attr in self.global_variables:
+                        arg.attr = self.global_variables[arg.attr]
 
         if isinstance(node.test.comparators[0], ast.Name):
-            if node.test.comparators[0].id in self.globs:
-                node.test.comparators[0].id = self.globs[node.test.comparators[0].id]
+            if node.test.comparators[0].id in self.global_variables:
+                node.test.comparators[0].id = self.global_variables[node.test.comparators[0].id]
 
         return node
 
@@ -304,8 +304,8 @@ class Obfuscator(NodeTransformer):
 
     def visit_arguments(self, node: arguments):
         for argument in node.args:
-            if argument.arg in self.globs:
-                argument.arg = self.globs[argument.arg]
+            if argument.arg in self.global_variables:
+                argument.arg = self.global_variables[argument.arg]
             else:
                 argument.arg = self.obfuscate_global(argument.arg)
         return node
@@ -335,8 +335,8 @@ class Obfuscator(NodeTransformer):
                 node.func.value = self.visit_Constant(node.func.value)
         node.args = [self.visit(x) for x in node.args]
         if isinstance(node.func, ast.Name):
-            if node.func.id in self.globs:
-                node.func.id = self.globs[node.func.id]
+            if node.func.id in self.global_variables:
+                node.func.id = self.global_variables[node.func.id]
         if node.func.__dict__.get('value'):
             nested = node.func.value.__dict__[list(node.func.value.__dict__.keys())[0]]
             if type(nested) != str:
@@ -345,12 +345,12 @@ class Obfuscator(NodeTransformer):
             if isinstance(node.func.__dict__['value'], ast.Name):
                 if node.func.__dict__['value'].id in self.imports:
                     node.func.__dict__['value'].id = self.obfuscate_global(node.func.__dict__['value'].id)
-                elif node.func.__dict__['value'].id in self.globs:
-                    node.func.__dict__['value'].id = self.globs[node.func.__dict__['value'].id]
+                elif node.func.__dict__['value'].id in self.global_variables:
+                    node.func.__dict__['value'].id = self.global_variables[node.func.__dict__['value'].id]
         for index,arg in enumerate(node.args):
             if isinstance(arg, Name):
-                if arg.id in self.globs:
-                    arg.id = self.globs[arg.id]
+                if arg.id in self.global_variables:
+                    arg.id = self.global_variables[arg.id]
             elif isinstance(arg, Call):
                 if isinstance(arg.func,Name):
                     arg.func = self.visit_Name(arg.func)
@@ -365,13 +365,13 @@ class Obfuscator(NodeTransformer):
                         continue
                     if arg.func.value.value == 'self':
                         pass
-                    if arg.func.value.value in self.globs:
-                        arg.func.value.value = self.globs[arg.func.value.value]
+                    if arg.func.value.value in self.global_variables:
+                        arg.func.value.value = self.global_variables[arg.func.value.value]
                     if isinstance(arg.func.value, Attribute):
-                        if arg.func.value.attr in self.globs:
-                            arg.func.value.attr = self.globs[arg.func.value.attr]
-                # if arg.func.value.id in self.globs:
-                #  arg.func.value.id = self.globs[arg.func.value.id]
+                        if arg.func.value.attr in self.global_variables:
+                            arg.func.value.attr = self.global_variables[arg.func.value.attr]
+                # if arg.func.value.id in self.global_variables:
+                #  arg.func.value.id = self.global_variables[arg.func.value.id]
             elif isinstance(arg,Constant):
                     if type(arg.value) == str:
         node.args[index] = self.visit_Str(arg)"""
@@ -387,14 +387,14 @@ class Obfuscator(NodeTransformer):
                 node.slice.__dict__['upper'] = self.__getattribute__(
                     "visit_" + str(type(upper)).split('.')[1].split("'")[0].strip())(upper)
         if isinstance(node.value, ast.Constant):
-            if node.value.value in self.globs:
-                node.value.value = self.globs[node.value.value]
+            if node.value.value in self.global_variables:
+                node.value.value = self.global_variables[node.value.value]
         elif isinstance(node.value, ast.Attribute):
-            if node.value.attr in self.globs:
-                node.value.attr = self.globs[node.value.attr]
+            if node.value.attr in self.global_variables:
+                node.value.attr = self.global_variables[node.value.attr]
         else:
-            if node.value.id in self.globs:
-                node.value.id = self.globs[node.value.id]
+            if node.value.id in self.global_variables:
+                node.value.id = self.global_variables[node.value.id]
 
         return node
 
@@ -451,7 +451,7 @@ class Obfuscator(NodeTransformer):
             return self.visit_classMethod(node)
         node.args = self.visit_arguments(node.args)
         self.indef = True
-        self.locs = {}
+        self.local_variables = {}
         node.name = self.obfuscate_global(node.name)
         node.body = [self.visit(x) for x in node.body]
         self.indef = False
@@ -489,13 +489,13 @@ class Obfuscator(NodeTransformer):
         return node
 
 
-class GlobalsEnforcer(Obfuscator):
+class ValidateGlobalVars(Obfuscator):
     def __init__(self, globs):
         Obfuscator.__init__(self)
-        self.globs = globs
+        self.global_variables = globs
 
     def visit_Name(self, node):
-        node.id = self.globs.get(node.id, node.id)
+        node.id = self.global_variables.get(node.id, node.id)
         return node
 
     def visit_classMethod(self, node):
@@ -511,7 +511,7 @@ class GlobalsEnforcer(Obfuscator):
         if node in self.functions:
             return self.visit_classMethod(node)
         self.indef = True
-        self.locs = {}
+        self.local_variables = {}
         node.name = self.obfuscate_global(node.name)
         node.body = [self.visit(x) for x in node.body]
         self.indef = False
@@ -646,5 +646,5 @@ class PythonEnvironment:
 """
 tree = parse(code)
 r = obf.visit(tree)
-r = GlobalsEnforcer(obf.globs).visit(r)
+r = ValidateGlobalVars(obf.globs).visit(r)
 print(unparse(r))
