@@ -168,8 +168,7 @@ class Obfuscator(NodeTransformer):
         return node
 
     def visit_Expr(self, node: Expr):
-        if isinstance(node.value, Call):
-            node.value = self.visit_Call(node.value)
+        node.value = self.visit(node.value)
         return node
 
     def visit_IfExp(self, node: IfExp):
@@ -235,6 +234,8 @@ class Obfuscator(NodeTransformer):
     def visit_While(self, node: While):
         return node
     def visit_Tuple(self, node: Tuple):
+        node.elts = [self.visit(x) for x in node.elts]
+
         return node
 
     def visit_For(self, node: For):
@@ -393,9 +394,16 @@ class Obfuscator(NodeTransformer):
 
         return node
 
+    def visit_Bytes(self, node: Bytes) :
+        return node
+
+
     def visit_Call(self, node: Call):
-        node.args = [self.visit(x) for x in node.args]
         node.func = self.visit(node.func)
+        for index,argument in enumerate(node.args):
+            if type(argument) == str:
+                node.args[index] = ast.arg(arg='"'+argument+'"',annotation=None)
+        node.args = [self.visit(x) for x in node.args]
         node.keywords = [self.visit(x) for x in node.keywords]
         return node
 
@@ -422,7 +430,6 @@ class Obfuscator(NodeTransformer):
         return node
 
     def visit_Assign(self, node: Assign):
-        print(node.value)
         node.value = self.visit(node.value)
 
         node.targets = [self.visit(x) for x in node.targets]
@@ -465,7 +472,6 @@ class Obfuscator(NodeTransformer):
             elif isinstance(value.value,Call):
                 value.value = self.visit_Call(value.value)
             else:
-                print(type(value.value))
                 if type(value.value) != str:
                     value.value = self.visit(value.value)
 
@@ -498,6 +504,9 @@ class Obfuscator(NodeTransformer):
         return node
 
     def visit_Name(self, node):
+        if isinstance(node,Tuple):
+            node = self.visit(node)
+            return node
         if __builtins__.__dict__.get(node.id):
             return node
         node.id = self.obfuscate_global(node.id)
@@ -516,6 +525,9 @@ class GlobalsEnforcer(Obfuscator):
         self.globs = globs
 
     def visit_Name(self, node):
+        if isinstance(node,ast.Tuple):
+            node = self.visit(node)
+            return node
         node.id = self.globs.get(node.id, node.id)
         return node
 
@@ -541,7 +553,6 @@ class GlobalsEnforcer(Obfuscator):
 
 obf = Obfuscator()
 code = r"""
-
 
 """
 tree = parse(code)
